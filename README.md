@@ -13,8 +13,7 @@ Simple App Chat adalah aplikasi chat sederhana yang dibuat menggunakan Node.js (
 #### Clone repo ini:
 
 ```bash
-git clone <URL-REPO-ANDA>
-cd <NAMA-FOLDER-REPO>
+git clone https://github.com/evanazhr/simple-realtime-chat-app.git
 ```
 
 #### Install Node.js
@@ -28,7 +27,7 @@ npm install
 Jalankan aplikasi:
 
 ```bash
-npm start
+npm run start
 ```
 Buka browser, akses:
 
