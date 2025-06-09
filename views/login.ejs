@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= register ? "Register" : "Login" %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #121212;
+      color: #eee;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    /* Container */
+    .container {
+      background: #1e1e1e;
+      padding: 2.5rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(38, 166, 154, 0.5);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      color: #eee;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      color: #26a69a;
+    }
+
+    /* Error message */
+    .error {
+      color: #e74c3c;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    /* Form */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      padding: 0.75rem 1rem;
+      border: 2px solid #333;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #292929;
+      color: #eee;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: #777;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #26a69a;
+      outline: none;
+      box-shadow: 0 0 10px #26a69aaa;
+      background: #222;
+    }
+
+    button {
+      background-color: #26a69a;
+      border: none;
+      color: #121212;
+      font-weight: 700;
+      padding: 0.85rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      background-color: #1e8e82;
+    }
+
+    /* Links */
+    .toggle-link {
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .toggle-link a {
+      color: #26a69a;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    .toggle-link a:hover {
+      color: #1e8e82;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2><%= register ? "Register" : "Login" %> to Chat</h2>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form method="POST" action="<%= register ? '/register' : '/login' %>">
+      <input name="username" type="text" placeholder="Username" required autocomplete="username" />
+      <input name="password" type="password" placeholder="Password" required autocomplete="<%= register ? 'new-password' : 'current-password' %>" />
+      <button type="submit"><%= register ? "Register" : "Login" %></button>
+    </form>
+
+    <% if (!register) { %>
+      <p class="toggle-link">Don't have an account? <a href="/register">Register here</a></p>
+    <% } else { %>
+      <p class="toggle-link">Have an account? <a href="/login">Login here</a></p>
+    <% } %>
+  </div>
+</body>
+</html>
