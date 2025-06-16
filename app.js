@@ -11,8 +11,9 @@ const db = new sqlite3.Database("./database.sqlite");
 const saltRounds = 10;
 const ENCRYPTION_KEY = "your-secret-key";
 
-// Buat tabel
+const onlineUsers = {}; // username -> socket.id
 
+// Setup DB
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,13 +45,11 @@ function checkAuth(req, res, next) {
   next();
 }
 
-app.get("/", (req, res) => {
-  res.redirect("/chat");
-});
+// ------------------- ROUTES ------------------- //
 
-app.get("/login", (req, res) => {
-  res.render("auth", { register: false, error: null });
-});
+app.get("/", (req, res) => res.redirect("/chat"));
+
+app.get("/login", (req, res) => res.render("auth", { register: false, error: null }));
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -67,9 +66,7 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.get("/register", (req, res) => {
-  res.render("auth", { register: true, error: null });
-});
+app.get("/register", (req, res) => res.render("auth", { register: true, error: null }));
 
 app.post("/register", (req, res) => {
   const { username, password } = req.body;
@@ -80,6 +77,8 @@ app.post("/register", (req, res) => {
     });
   });
 });
+
+// ------------------- CHAT ------------------- //
 
 // Global Chat
 app.get("/chat", checkAuth, (req, res) => {
@@ -107,37 +106,51 @@ app.get("/chat/:targetUser", checkAuth, (req, res) => {
   const { username } = req.session;
   const target = req.params.targetUser;
 
-  db.all(
-    `SELECT * FROM messages WHERE 
-      (sender = ? AND receiver = ?) OR 
-      (sender = ? AND receiver = ?) ORDER BY timestamp ASC`,
-    [username, target, target, username],
-    (err, messages) => {
-      const decryptedMessages = messages.map((msg) => {
-        try {
-          const bytes = CryptoJS.AES.decrypt(msg.message, ENCRYPTION_KEY);
-          msg.message = bytes.toString(CryptoJS.enc.Utf8) || "[DECRYPTION FAILED]";
-        } catch {
-          msg.message = "[ERROR]";
-        }
-        return msg;
-      });
+  if (target === username) return res.redirect("/chat");
 
-      res.render("chat", {
-        username,
-        messages: decryptedMessages,
-        chattingWith: target
-      });
-    }
-  );
+  db.get("SELECT * FROM users WHERE username = ?", [target], (err, user) => {
+    if (!user) return res.redirect("/chat");
+
+    db.all(
+      `SELECT * FROM messages WHERE 
+        (sender = ? AND receiver = ?) OR 
+        (sender = ? AND receiver = ?) ORDER BY timestamp ASC`,
+      [username, target, target, username],
+      (err, messages) => {
+        const decryptedMessages = messages.map((msg) => {
+          try {
+            const bytes = CryptoJS.AES.decrypt(msg.message, ENCRYPTION_KEY);
+            msg.message = bytes.toString(CryptoJS.enc.Utf8) || "[DECRYPTION FAILED]";
+          } catch {
+            msg.message = "[ERROR]";
+          }
+          return msg;
+        });
+
+        res.render("chat", {
+          username,
+          messages: decryptedMessages,
+          chattingWith: target
+        });
+      }
+    );
+  });
 });
 
 app.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
+// ------------------- SOCKET.IO ------------------- //
+
 io.on("connection", (socket) => {
   console.log("User connected");
+
+  socket.on("join", (username) => {
+    socket.username = username;
+    onlineUsers[username] = socket.id;
+    console.log(`${username} connected as ${socket.id}`);
+  });
 
   socket.on("new_message", (data) => {
     const { sender, receiver, message } = data;
@@ -148,8 +161,14 @@ io.on("connection", (socket) => {
       [sender, receiver || null, message, timestamp],
       (err) => {
         if (err) return console.error(err);
+
+        const msgPayload = { sender, receiver, message, timestamp };
+
         if (receiver) {
-          io.to(receiver).emit("new_message", { sender, receiver, message, timestamp });
+          const targetSocketId = onlineUsers[receiver];
+          const senderSocketId = onlineUsers[sender];
+          if (targetSocketId) io.to(targetSocketId).emit("private_message", msgPayload);
+          if (senderSocketId) io.to(senderSocketId).emit("private_message", msgPayload);
         } else {
           io.emit("new_message", { sender, message, timestamp });
         }
@@ -158,6 +177,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    if (socket.username) {
+      delete onlineUsers[socket.username];
+      console.log(`${socket.username} disconnected`);
+    }
   });
 });

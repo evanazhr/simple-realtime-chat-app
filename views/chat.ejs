@@ -3,53 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chat Room</title>
+    <title><%= chattingWith ? `Chatting with ${chattingWith}` : "Global Chat" %></title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   </head>
   <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
-    <header class="bg-teal-500 text-gray-900 px-6 py-4 flex justify-between items-center shadow-md font-semibold">
+    <header
+      class="bg-teal-500 text-gray-900 px-6 py-4 flex justify-between items-center shadow-md font-semibold"
+    >
       <div>
-        Welcome, <%= username %>
-        <% if (chattingWith) { %>
-          | Chatting with <%= chattingWith %>
-        <% } else { %>
-          | Global Chat
-        <% } %>
+        Welcome, <%= username %> <% if (chattingWith) { %> | Chatting with<span class="font-bold text-xl">
+          <%=
+          chattingWith %> 
+        </span> 
+        <% } else { %> | Global Chat <% } %>
       </div>
-      <a href="/logout" class="bg-teal-200 px-3 py-1 rounded hover:bg-teal-300 font-bold transition">Logout</a>
+      <div class="flex gap-3">
+        <a
+          href="/chat"
+          class="bg-teal-200 px-3 py-1 rounded hover:bg-teal-300 font-bold transition text-sm"
+          >Global Chat</a
+        >
+        <a
+          href="/logout"
+          class="bg-red-400 px-3 py-1 rounded hover:bg-red-500 text-white font-bold transition text-sm"
+          >Logout</a
+        >
+      </div>
     </header>
 
-    <main class="flex-1 flex flex-col max-w-2xl w-full mx-auto my-4 bg-gray-800 rounded-xl shadow-lg p-6">
-      <div id="chat-box" class="flex-1 flex flex-col overflow-y-auto bg-gray-700 rounded-lg p-4 mb-4 space-y-2 shadow-inner">
-        <% function getColorClass(username) {
-            const colors = [ "text-red-400", "text-blue-400", "text-yellow-400", "text-green-400", "text-pink-400", "text-purple-400", "text-orange-400", "text-cyan-400", "text-lime-400" ];
-            let hash = 0;
-            for (let i = 0; i < username.length; i++) {
-              hash = username.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const index = Math.abs(hash) % colors.length;
-            return colors[index];
-        } %>
-        <% let lastDate = ''; messages.forEach(msg => {
-            const msgDate = new Date(msg.timestamp).toDateString();
-            if (msgDate !== lastDate) { lastDate = msgDate; %>
-              <div class="text-center text-sm text-gray-400 mt-2 mb-1">
-                <%= new Date(msg.timestamp).toLocaleDateString() %>
-              </div>
+    <main
+      class="flex-1 flex flex-col max-w-2xl w-full mx-auto my-4 bg-gray-800 rounded-xl shadow-lg p-6"
+    >
+      <div
+        id="chat-box"
+        class="flex-1 flex flex-col overflow-y-auto bg-gray-700 rounded-lg p-4 mb-4 space-y-2 shadow-inner"
+      >
+        <% function getColorClass(username) { const colors = [ "text-red-400",
+        "text-blue-400", "text-yellow-400", "text-green-400", "text-pink-400",
+        "text-purple-400", "text-orange-400", "text-cyan-400", "text-lime-400"
+        ]; let hash = 0; for (let i = 0; i < username.length; i++) { hash =
+        username.charCodeAt(i) + ((hash << 5) - hash); } const index =
+        Math.abs(hash) % colors.length; return colors[index]; } %> <% let
+        lastDate = ''; messages.forEach(msg => { const msgDate = new
+        Date(msg.timestamp).toDateString(); if (msgDate !== lastDate) { lastDate
+        = msgDate; %>
+        <div class="text-center text-sm text-gray-400 mt-2 mb-1">
+          <%= new Date(msg.timestamp).toLocaleDateString() %>
+        </div>
         <% } %>
-        <p class="<%= msg.sender === username ? 'bg-teal-700 self-end text-teal-100 font-semibold' : 'bg-gray-600' %> px-4 py-2 rounded-lg shadow max-w-[80%] break-words">
-          <strong class="<%= msg.sender === username ? 'text-teal-300' : getColorClass(msg.sender) %>">
+        <p
+          class="<%= msg.sender === username ? 'bg-teal-700 self-end text-teal-100 font-semibold' : 'bg-gray-600' %> px-4 py-2 rounded-lg shadow relative group max-w-[80%] break-words"
+        >
+          <a
+            class="<%= msg.sender === username ? '' : 'group-hover:block group-active:block' %> hidden absolute top-0 left-0 -translate-y-full bg-transparent text-gray-900 font-bold px-2 py-1 rounded-[8px]"
+            href="/chat/<%= msg.sender %>"
+          >
+            <span class="text-xs text-gray-900 rounded px-1 py-1 bg-orange-500"
+              >Chat Pribadi</span
+            >
+          </a>
+          <strong
+            class="<%= msg.sender === username ? 'text-teal-300' : getColorClass(msg.sender) %>"
+          >
             <%= msg.sender === username ? 'You' : msg.sender %>:
           </strong>
           <%= msg.message %>
           <span class="text-xs text-gray-400 block mt-1">
-            <%= new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+            <%= new Date(msg.timestamp).toLocaleTimeString([], { hour:
+            '2-digit', minute: '2-digit' }) %>
           </span>
         </p>
         <% }) %>
       </div>
+      <div class="sticky bottom-0 bg-gray-800 p-4 z-10">
 
       <form onsubmit="sendMessage(event)" class="flex gap-3">
         <input
@@ -58,10 +86,14 @@
           placeholder="Type a message..."
           class="flex-1 bg-gray-900 border border-teal-500 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
         />
-        <button type="submit" class="bg-teal-500 text-gray-900 font-bold px-5 py-2 rounded-lg hover:bg-teal-600 transition">
+        <button
+          type="submit"
+          class="bg-teal-500 text-gray-900 font-bold px-5 py-2 rounded-lg hover:bg-teal-600 transition"
+        >
           Send
         </button>
       </form>
+      </div>
     </main>
 
     <script>
@@ -72,23 +104,25 @@
       socket.emit("join", username);
 
       socket.on("new_message", (data) => {
-        if (chattingWith) return;
+        if (chattingWith || data.sender === username) return;
         displayMessage(data);
       });
 
       socket.on("private_message", (data) => {
-        const isPrivate = chattingWith === data.sender || (data.sender === username && data.receiver === chattingWith);
+        const isPrivate =
+          chattingWith === data.sender ||
+          (data.sender === username && data.receiver === chattingWith);
         if (!isPrivate) return;
         displayMessage(data);
       });
 
       function sanitizeHTML(str) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.innerText = str;
         return div.innerHTML;
       }
 
-      let lastRenderedDate = '';
+      let lastRenderedDate = "";
 
       function displayMessage(data) {
         const secretKey = "your-secret-key";
@@ -99,28 +133,47 @@
 
         const chatBox = document.getElementById("chat-box");
         const msgDate = new Date(data.timestamp).toDateString();
-        const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const time = new Date(data.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
 
         // Tambahkan tanggal jika beda dari sebelumnya
         if (msgDate !== lastRenderedDate) {
           const dateDiv = document.createElement("div");
           dateDiv.className = "text-center text-sm text-gray-400 mt-2 mb-1";
-          dateDiv.innerText = new Date(data.timestamp).toLocaleDateString();
+          dateDiv.innerText = new Date(data.timestamp).toLocaleDateString('en-US');
           chatBox.appendChild(dateDiv);
           lastRenderedDate = msgDate;
         }
 
         const p = document.createElement("p");
         p.className =
-          data.sender === username
-            ? "bg-teal-700 self-end text-teal-100 font-semibold px-4 py-2 rounded-lg shadow max-w-[80%] break-words"
-            : "bg-gray-600 px-4 py-2 rounded-lg shadow max-w-[80%] break-words";
+          (data.sender === username
+            ? "bg-teal-700 self-end text-teal-100 font-semibold"
+            : "bg-gray-600") +
+          " px-4 py-2 rounded-lg shadow relative group max-w-[80%] break-words";
 
-        const colorClass = data.sender === username ? "text-teal-300" : getColorClass(data.sender);
+        const colorClass =
+          data.sender === username
+            ? "text-teal-300"
+            : getColorClass(data.sender);
         const senderLabel = data.sender === username ? "You" : data.sender;
 
-        p.innerHTML = `<strong class="${colorClass}">${senderLabel}:</strong> ${sanitizeHTML(decryptedMessage)}
-          <span class="text-xs text-gray-400 block mt-1">${time}</span>`;
+        const hoverLink =
+          data.sender !== username
+            ? `<a class="group-hover:block group-active:block hidden absolute top-0 left-0 -translate-y-full bg-transparent text-gray-900 font-bold px-2 py-1 rounded-[8px]" href="/chat/${data.sender}">
+        <span class="text-xs text-gray-400 rounded px-1 py-1 bg-orange-500">Chat Pribadi</span>
+      </a>`
+            : "";
+
+        p.innerHTML = `
+    ${hoverLink}
+    <strong class="${colorClass}">${senderLabel}:</strong> ${sanitizeHTML(
+          decryptedMessage
+        )}
+    <span class="text-xs text-gray-400 block mt-1">${time}</span>
+  `;
 
         chatBox.appendChild(p);
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -133,26 +186,41 @@
         if (!rawMessage) return;
 
         const secretKey = "your-secret-key";
-        const encrypted = CryptoJS.AES.encrypt(rawMessage, secretKey).toString();
+        const encrypted = CryptoJS.AES.encrypt(
+          rawMessage,
+          secretKey
+        ).toString();
         const now = new Date().toISOString();
 
         const msgData = {
           sender: username,
           message: encrypted,
           receiver: chattingWith || null,
-          timestamp: now
+          timestamp: now,
         };
 
         socket.emit("new_message", msgData);
 
-        // Tampilkan langsung di sisi pengirim
-        displayMessage(msgData);
+        // Tampilkan langsung di sisi pengirim global
+        if(msgData.receiver === null){
+          displayMessage(msgData);
+        }       
 
         input.value = "";
       }
 
       function getColorClass(name) {
-        const colors = [ "text-red-400", "text-blue-400", "text-yellow-400", "text-green-400", "text-pink-400", "text-purple-400", "text-orange-400", "text-cyan-400", "text-lime-400" ];
+        const colors = [
+          "text-red-400",
+          "text-blue-400",
+          "text-yellow-400",
+          "text-green-400",
+          "text-pink-400",
+          "text-purple-400",
+          "text-orange-400",
+          "text-cyan-400",
+          "text-lime-400",
+        ];
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
           hash = name.charCodeAt(i) + ((hash << 5) - hash);
