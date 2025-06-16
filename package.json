@@ -15,6 +15,7 @@
   "homepage": "https://github.com/ngrt/simpleChatApp#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "crypto-js": "^4.2.0",
     "ejs": "^2.7.4",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
