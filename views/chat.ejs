@@ -3,9 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><%= chattingWith ? `Chatting with ${chattingWith}` : "Global Chat" %></title>
+    <title>
+      <%= chattingWith ? `Chatting with ${chattingWith}` : "Global Chat" %>
+    </title>
+
+    <!-- boxicons -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   </head>
   <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
@@ -13,10 +22,11 @@
       class="bg-teal-500 text-gray-900 px-6 py-4 flex justify-between items-center shadow-md font-semibold"
     >
       <div>
-        Welcome, <%= username %> <% if (chattingWith) { %> | Chatting with<span class="font-bold text-xl">
-          <%=
-          chattingWith %> 
-        </span> 
+        Welcome, <%= username %> <% if (chattingWith) { %> | Chatting with<span
+          class="font-bold text-xl"
+        >
+          <%= chattingWith %>
+        </span>
         <% } else { %> | Global Chat <% } %>
       </div>
       <div class="flex gap-3">
@@ -26,10 +36,17 @@
           >Global Chat</a
         >
         <a
-          href="/logout"
-          class="bg-red-400 px-3 py-1 rounded hover:bg-red-500 text-white font-bold transition text-sm"
-          >Logout</a
+          href="/users"
+          class="bg-teal-200 px-3 py-1 rounded hover:bg-teal-300 font-bold transition text-sm"
+          >Cari Pengguna</a
         >
+        <a
+          href="/logout"
+          title="Logout"
+          class="bg-red-400 px-3 py-1 rounded hover:bg-red-500 text-white font-bold transition text-sm"
+        >
+          <i class="bx bx-exit text-2xl"></i
+        ></a>
       </div>
     </header>
 
@@ -54,7 +71,7 @@
         </div>
         <% } %>
         <p
-          class="<%= msg.sender === username ? 'bg-teal-700 self-end text-teal-100 font-semibold' : 'bg-gray-600' %> px-4 py-2 rounded-lg shadow relative group max-w-[80%] break-words"
+          class="<%= msg.sender === username ? 'bg-teal-700 self-end text-teal-100 font-semibold' : 'bg-gray-600' %> px-4 py-2 rounded-lg shadow relative group max-w-[80%] break-words flex flex-col"
         >
           <a
             class="<%= msg.sender === username ? '' : 'group-hover:block group-active:block' %> hidden absolute top-0 left-0 -translate-y-full bg-transparent text-gray-900 font-bold px-2 py-1 rounded-[8px]"
@@ -67,10 +84,10 @@
           <strong
             class="<%= msg.sender === username ? 'text-teal-300' : getColorClass(msg.sender) %>"
           >
-            <%= msg.sender === username ? 'You' : msg.sender %>:
+            <%= msg.sender === username ? 'You' : msg.sender %>
           </strong>
           <%= msg.message %>
-          <span class="text-xs text-gray-400 block mt-1">
+          <span class="text-xs text-gray-400 block mt-1 self-end">
             <%= new Date(msg.timestamp).toLocaleTimeString([], { hour:
             '2-digit', minute: '2-digit' }) %>
           </span>
@@ -78,21 +95,20 @@
         <% }) %>
       </div>
       <div class="sticky bottom-0 bg-gray-800 p-4 z-10">
-
-      <form onsubmit="sendMessage(event)" class="flex gap-3">
-        <input
-          id="message"
-          autocomplete="off"
-          placeholder="Type a message..."
-          class="flex-1 bg-gray-900 border border-teal-500 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
-        />
-        <button
-          type="submit"
-          class="bg-teal-500 text-gray-900 font-bold px-5 py-2 rounded-lg hover:bg-teal-600 transition"
-        >
-          Send
-        </button>
-      </form>
+        <form onsubmit="sendMessage(event)" class="flex gap-3">
+          <input
+            id="message"
+            autocomplete="off"
+            placeholder="Type a message..."
+            class="flex-1 bg-gray-900 border border-teal-500 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
+          />
+          <button
+            type="submit"
+            class="bg-teal-500 text-gray-900 font-bold px-5 py-2 rounded-lg hover:bg-teal-600 transition"
+          >
+            Send
+          </button>
+        </form>
       </div>
     </main>
 
@@ -142,7 +158,9 @@
         if (msgDate !== lastRenderedDate) {
           const dateDiv = document.createElement("div");
           dateDiv.className = "text-center text-sm text-gray-400 mt-2 mb-1";
-          dateDiv.innerText = new Date(data.timestamp).toLocaleDateString('en-US');
+          dateDiv.innerText = new Date(data.timestamp).toLocaleDateString(
+            "en-US"
+          );
           chatBox.appendChild(dateDiv);
           lastRenderedDate = msgDate;
         }
@@ -202,9 +220,9 @@
         socket.emit("new_message", msgData);
 
         // Tampilkan langsung di sisi pengirim global
-        if(msgData.receiver === null){
+        if (msgData.receiver === null) {
           displayMessage(msgData);
-        }       
+        }
 
         input.value = "";
       }

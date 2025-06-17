@@ -141,11 +141,23 @@ app.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
+
+
+// list users
+
+app.get("/users", checkAuth, (req, res) => {
+  const { username } = req.session;
+
+  db.all("SELECT * FROM users", (err, users) => {
+    res.render("users", { users, username });
+  });
+})
+
+
 // ------------------- SOCKET.IO ------------------- //
 
 io.on("connection", (socket) => {
-  console.log("User connected");
-
+  
   socket.on("join", (username) => {
     socket.username = username;
     onlineUsers[username] = socket.id;

@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Homepage - Dark Chat App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-  </style>
-</head>
-<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center px-4">
-  <div class="bg-gray-800 w-full max-w-md p-10 rounded-xl shadow-lg text-center">
-    <h1 class="text-4xl font-bold text-teal-300 mb-6 drop-shadow-md">Welcome to the Chat App</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Homepage - Dark Chat App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center px-4"
+  >
+    <div
+      class="bg-gray-800 w-full max-w-md p-10 rounded-xl shadow-lg text-center"
+    >
+      <h1 class="text-4xl font-bold text-teal-300 mb-6 drop-shadow-md">
+        Welcome to the Chat App
+      </h1>
 
-    <% if (user) { %>
+      <% if (user) { %>
       <p class="text-lg mb-4">Hello, <%= user.username %>!</p>
       <div class="flex flex-wrap justify-center gap-4 mt-4">
-        <a href="/chat" class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300">Go to Chat</a>
-        <a href="/logout" class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300">Logout</a>
+        <a
+          href="/chat"
+          class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300"
+          >Go to Chat</a
+        >
+        <a
+          href="/logout"
+          class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300"
+          >Logout</a
+        >
       </div>
-    <% } else { %>
+      <% } else { %>
       <div class="flex flex-wrap justify-center gap-4 mt-4">
-        <a href="/login" class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300">Login</a>
-        <a href="/register" class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300">Register</a>
+        <a
+          href="/login"
+          class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300"
+          >Login</a
+        >
+        <a
+          href="/register"
+          class="bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold px-6 py-3 rounded-full transition duration-300"
+          >Register</a
+        >
       </div>
-    <% } %>
-  </div>
-</body>
+      <% } %>
+    </div>
+  </body>
 </html>

@@ -4,23 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>All Users</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+  
+  <!-- boxicons -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+  <!-- tailwindcss -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
     body {
       font-family: 'Nunito', sans-serif;
     }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 p-8">
+  <header>
+    <a href="/chat"><i class='bx bxs-chevron-left'></i> Kembali</a>
+  </header>
   <h2 class="text-3xl font-bold text-teal-400 text-center mb-6">Registered Users</h2>
 
   <div class="max-w-xl mx-auto bg-gray-800 p-6 rounded-xl shadow-lg">
-    <% users.forEach(user => { %>
-      <div class="mb-3 last:mb-0 p-3 bg-gray-700 rounded-lg shadow-md">
-        <strong class="text-teal-400"><%= user.username %></strong>
-        <% if (user.id !== undefined) { %>
-          <span class="text-sm text-gray-300"> - ID: <%= user.id %></span>
-        <% } %>
+    <% users.filter(user => user.username !== username).forEach(user => { %>
+      <div class="mb-3 last:mb-0 p-3 bg-gray-700 flex items-center justify-between rounded-lg shadow-md">
+        <div>
+          <strong class="text-teal-400"><%= user.username %></strong>
+          <% if (user.id !== undefined) { %>
+            <span class="text-sm text-gray-300"> - ID: <%= user.id %></span>
+          <% } %>
+        </div>
+        <a href="/chat/<%= user.username %>"><i class='bx bx-message-dots text-2xl'></i></a>
       </div>
     <% }) %>
   </div>
