@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app"
+    "dev": "nodemon ./src/app.js"
   },
   "author": "Evan Azhar Hartana",
   "license": "ISC",
@@ -16,6 +16,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.0",
     "ejs": "^2.7.4",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
